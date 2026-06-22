@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time Keeper</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f2a4a 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      color: #e2e8f0;
+    }
+
+    /* ── Main Card ── */
+    .card {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 480px;
+      box-shadow:
+        0 25px 50px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255,255,255,0.05) inset;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 2rem;
+    }
+
+    .header-icon {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, #3b82f6, #6366f1);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+      flex-shrink: 0;
+    }
+
+    .header-text h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: -0.3px;
+    }
+
+    .header-text p {
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    /* ── Schedule Reference Block ── */
+    .schedule-ref {
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .schedule-ref-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #60a5fa;
+      margin-bottom: 0.75rem;
+    }
+
+    .schedule-times {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .time-pill {
+      flex: 1;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 0.6rem 0.5rem;
+    }
+
+    .time-pill .label {
+      font-size: 0.68rem;
+      color: #94a3b8;
+      margin-bottom: 3px;
+    }
+
+    .time-pill .value {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+
+    .time-arrow {
+      color: #475569;
+      font-size: 1.1rem;
+    }
+
+    .duration-pill {
+      text-align: center;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 10px;
+      padding: 0.6rem 0.8rem;
+    }
+
+    .duration-pill .label {
+      font-size: 0.68rem;
+      color: #a5b4fc;
+      margin-bottom: 3px;
+    }
+
+    .duration-pill .value {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #c7d2fe;
+    }
+
+    /* ── Input Section ── */
+    .input-section {
+      margin-bottom: 1.8rem;
+    }
+
+    .input-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+
+    .input-label span {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .input-hint {
+      font-size: 0.7rem;
+      color: #64748b;
+      background: rgba(255,255,255,0.06);
+      padding: 2px 8px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .time-input-wrapper {
+      position: relative;
+    }
+
+    .time-input-wrapper .input-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      color: #60a5fa;
+      pointer-events: none;
+    }
+
+    input[type="time"] {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 0.9rem 1rem 0.9rem 3rem;
+      color: #f1f5f9;
+      font-size: 1.3rem;
+      font-weight: 600;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+
+    input[type="time"]:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(96, 165, 250, 0.4);
+    }
+
+    input[type="time"]:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Chrome/Edge time input colour fixes */
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      filter: invert(1) opacity(0.5);
+      cursor: pointer;
+    }
+
+    /* ── Result Section ── */
+    .result-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 1.2rem;
+      transition: border-color 0.3s;
+    }
+
+    .result-card.on-time {
+      border-color: rgba(34, 197, 94, 0.35);
+      background: rgba(34, 197, 94, 0.05);
+    }
+
+    .result-card.late {
+      border-color: rgba(251, 146, 60, 0.35);
+      background: rgba(251, 146, 60, 0.05);
+    }
+
+    .result-out-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #64748b;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-out-time {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -1px;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #f1f5f9, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      transition: opacity 0.2s;
+    }
+
+    .result-out-time.on-time {
+      background: linear-gradient(135deg, #4ade80, #22d3ee);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .result-out-time.late {
+      background: linear-gradient(135deg, #fb923c, #fbbf24);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    /* ── Status Badge ── */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      transition: all 0.25s;
+    }
+
+    .status-badge.on-time {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .status-badge.late {
+      background: rgba(251, 146, 60, 0.15);
+      color: #fb923c;
+      border: 1px solid rgba(251, 146, 60, 0.3);
+    }
+
+    /* ── Friendly Message ── */
+    .result-message {
+      font-size: 0.87rem;
+      color: #94a3b8;
+      line-height: 1.5;
+      min-height: 2.5em;
+      transition: color 0.2s;
+    }
+
+    /* ── Duration Bar ── */
+    .duration-info {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.78rem;
+      color: #64748b;
+    }
+
+    .duration-badge {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 3px 10px;
+      color: #94a3b8;
+      font-weight: 600;
+      font-size: 0.78rem;
+    }
+
+    /* ── Empty / Placeholder State ── */
+    .placeholder-text {
+      color: #475569;
+      font-style: italic;
+      font-size: 0.85rem;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .footer .heart {
+      color: #f43f5e;
+      font-size: 0.9rem;
+      animation: pulse 1.4s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.25); }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 520px) {
+      .card { padding: 2rem 1.4rem; border-radius: 18px; }
+      .result-out-time { font-size: 2.4rem; }
+      .schedule-times { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card" role="main">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-icon" aria-hidden="true">🕐</div>
+      <div class="header-text">
+        <h1>Time Keeper</h1>
+        <p>Work clock-out calculator</p>
+      </div>
+    </div>
+
+    <!-- Standard Schedule Reference -->
+    <div class="schedule-ref" aria-label="Standard shift schedule">
+      <div class="schedule-ref-title">Standard Shift</div>
+      <div class="schedule-times">
+        <div class="time-pill">
+          <div class="label">Clock In</div>
+          <div class="value">8:15 AM</div>
+        </div>
+        <div class="time-arrow" aria-hidden="true">→</div>
+        <div class="time-pill">
+          <div class="label">Clock Out</div>
+          <div class="value">5:00 PM</div>
+        </div>
+        <div class="duration-pill">
+          <div class="label">Duration</div>
+          <div class="value">8h 45m</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Time Input -->
+    <div class="input-section">
+      <div class="input-label">
+        <span>Your Clock-In Time</span>
+        <span class="input-hint">24-hr format</span>
+      </div>
+      <div class="time-input-wrapper">
+        <span class="input-icon" aria-hidden="true">⏱</span>
+        <input
+          type="time"
+          id="clockInTime"
+          aria-label="Enter your clock-in time"
+          autocomplete="off"
+        />
+      </div>
+    </div>
+
+    <!-- Result Card -->
+    <div class="result-card" id="resultCard" aria-live="polite">
+      <div class="result-out-label">Required Clock-Out</div>
+      <div class="result-out-time" id="outTime">
+        <span class="placeholder-text">–:– –</span>
+      </div>
+      <div id="statusBadge"></div>
+      <div class="result-message" id="resultMessage">
+        Enter your clock-in time above to calculate.
+      </div>
+      <div class="duration-info" id="durationInfo" style="display:none;">
+        <span>Total work duration:</span>
+        <span class="duration-badge" id="totalDuration">8h 45m</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <span>Developed by Sankha</span>
+    <span class="heart" aria-label="with love">♥</span>
+  </footer>
+
+  <script>
+    /* ── Constants ── */
+    const STANDARD_IN_MINUTES  = 8 * 60 + 15;  // 8:15 AM = 495 min from midnight
+    const STANDARD_OUT_MINUTES = 17 * 60;        // 5:00 PM = 1020 min from midnight
+    const SHIFT_DURATION       = STANDARD_OUT_MINUTES - STANDARD_IN_MINUTES; // 525 min (8h45m)
+
+    /* ── DOM Refs ── */
+    const inputEl       = document.getElementById('clockInTime');
+    const resultCard    = document.getElementById('resultCard');
+    const outTimeEl     = document.getElementById('outTime');
+    const statusBadge   = document.getElementById('statusBadge');
+    const resultMsg     = document.getElementById('resultMessage');
+    const durationInfo  = document.getElementById('durationInfo');
+    const totalDurEl    = document.getElementById('totalDuration');
+
+    /* ── Convert minutes-from-midnight to 12hr string ── */
+    function to12hr(minutes) {
+      const h24  = Math.floor(minutes / 60) % 24;
+      const m    = minutes % 60;
+      const ampm = h24 >= 12 ? 'PM' : 'AM';
+      const h12  = h24 % 12 === 0 ? 12 : h24 % 12;
+      return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
+    }
+
+    /* ── Format delay/duration as "Xh Ym" or "Ym" ── */
+    function formatDuration(totalMinutes) {
+      const h = Math.floor(totalMinutes / 60);
+      const m = totalMinutes % 60;
+      if (h > 0 && m > 0) return `${h}h ${m}m`;
+      if (h > 0)           return `${h}h`;
+      return `${m}m`;
+    }
+
+    /* ── Main Calculation & UI Update ── */
+    function calculate() {
+      const raw = inputEl.value; // "HH:MM" or ""
+
+      /* No input yet — reset to placeholder state */
+      if (!raw) {
+        resultCard.className = 'result-card';
+        outTimeEl.className  = 'result-out-time';
+        outTimeEl.innerHTML  = '<span class="placeholder-text">–:– –</span>';
+        statusBadge.innerHTML = '';
+        resultMsg.textContent = 'Enter your clock-in time above to calculate.';
+        durationInfo.style.display = 'none';
+        return;
+      }
+
+      /* Parse the input into minutes-from-midnight */
+      const [hh, mm]   = raw.split(':').map(Number);
+      const inMinutes  = hh * 60 + mm;
+
+      /* Calculate delay and required out time */
+      const delay        = Math.max(0, inMinutes - STANDARD_IN_MINUTES);
+      const outMinutes   = STANDARD_OUT_MINUTES + delay;
+      const isLate       = delay > 0;
+      const outTimeStr   = to12hr(outMinutes);
+
+      /* ── Update result time ── */
+      outTimeEl.className  = `result-out-time ${isLate ? 'late' : 'on-time'}`;
+      outTimeEl.textContent = outTimeStr;
+
+      /* ── Update card style ── */
+      resultCard.className = `result-card ${isLate ? 'late' : 'on-time'}`;
+
+      /* ── Status badge ── */
+      if (isLate) {
+        statusBadge.innerHTML =
+          `<span class="status-badge late">⏰ Late by ${formatDuration(delay)}</span>`;
+      } else {
+        statusBadge.innerHTML =
+          `<span class="status-badge on-time">✅ On Time</span>`;
+      }
+
+      /* ── Friendly message ── */
+      if (isLate) {
+        resultMsg.textContent =
+          `You clocked in ${formatDuration(delay)} late — you'll need to stay until ${outTimeStr} (${formatDuration(delay)} after 5:00 PM).`;
+      } else {
+        const earlyBy = STANDARD_IN_MINUTES - inMinutes;
+        if (earlyBy > 0) {
+          resultMsg.textContent =
+            `You're ${formatDuration(earlyBy)} early — great start! Clock out at the standard 5:00 PM.`;
+        } else {
+          resultMsg.textContent =
+            `Right on schedule! Clock out at the standard 5:00 PM.`;
+        }
+      }
+
+      /* ── Duration indicator ── */
+      durationInfo.style.display = 'flex';
+      totalDurEl.textContent = formatDuration(SHIFT_DURATION); // always 8h 45m
+    }
+
+    /* ── Event Listener: real-time update ── */
+    inputEl.addEventListener('input', calculate);
+    inputEl.addEventListener('change', calculate);
+
+    /* ── Pre-populate with current time on load ── */
+    (function setCurrentTime() {
+      const now = new Date();
+      const hh  = String(now.getHours()).padStart(2, '0');
+      const mm  = String(now.getMinutes()).padStart(2, '0');
+      inputEl.value = `${hh}:${mm}`;
+      calculate();
+    })();
+  </script>
+
+</body>
+</html>
