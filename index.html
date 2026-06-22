@@ -1,549 +1,918 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Time Keeper</title>
-  <style>
-    /* ── Reset & Base ── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>Time Keeper · Mobile</title>
+    <style>
+        /* ── Reset & Base ── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    body {
-      min-height: 100vh;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f2a4a 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem 1rem;
-      color: #e2e8f0;
-    }
+        body {
+            min-height: 100dvh;
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            background: #0d1829;
+            background: radial-gradient(ellipse at 20% 30%, #162a44, #0a121f);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 14px;
+            color: #e8edf5;
+            touch-action: manipulation;
+        }
 
-    /* ── Main Card ── */
-    .card {
-      background: rgba(255, 255, 255, 0.06);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 24px;
-      padding: 2.5rem 2rem;
-      width: 100%;
-      max-width: 480px;
-      box-shadow:
-        0 25px 50px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(255,255,255,0.05) inset;
-    }
+        /* ── Card ── */
+        .card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 28px;
+            padding: 20px 18px 24px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+        }
 
-    /* ── Header ── */
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 2rem;
-    }
+        /* ── Header ── */
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
 
-    .header-icon {
-      width: 52px;
-      height: 52px;
-      background: linear-gradient(135deg, #3b82f6, #6366f1);
-      border-radius: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-      flex-shrink: 0;
-    }
+        .header-icon {
+            width: 48px;
+            height: 48px;
+            min-height: 44px;
+            min-width: 44px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 6px 18px rgba(59, 130, 246, 0.3);
+            flex-shrink: 0;
+        }
 
-    .header-text h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #f1f5f9;
-      letter-spacing: -0.3px;
-    }
+        .header-text h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
 
-    .header-text p {
-      font-size: 0.8rem;
-      color: #94a3b8;
-      margin-top: 2px;
-    }
+        .header-text p {
+            font-size: 0.75rem;
+            color: #7a8fb0;
+            margin-top: 1px;
+            font-weight: 400;
+        }
 
-    /* ── Schedule Reference Block ── */
-    .schedule-ref {
-      background: rgba(59, 130, 246, 0.1);
-      border: 1px solid rgba(59, 130, 246, 0.25);
-      border-radius: 14px;
-      padding: 1rem 1.2rem;
-      margin-bottom: 1.8rem;
-    }
+        /* ── Schedule Reference (shows 8:15 AM / 5:00 PM) ── */
+        .schedule-ref {
+            background: rgba(59, 130, 246, 0.07);
+            border: 1px solid rgba(59, 130, 246, 0.15);
+            border-radius: 16px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+        }
 
-    .schedule-ref-title {
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: #60a5fa;
-      margin-bottom: 0.75rem;
-    }
+        .schedule-ref-title {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #60a5fa;
+            text-align: center;
+            margin-bottom: 8px;
+        }
 
-    .schedule-times {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
+        .schedule-grid {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
 
-    .time-pill {
-      flex: 1;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.06);
-      border-radius: 10px;
-      padding: 0.6rem 0.5rem;
-    }
+        .time-pill {
+            flex: 1 1 0;
+            min-width: 56px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 12px;
+            padding: 6px 4px;
+        }
 
-    .time-pill .label {
-      font-size: 0.68rem;
-      color: #94a3b8;
-      margin-bottom: 3px;
-    }
+        .time-pill .label {
+            font-size: 0.55rem;
+            font-weight: 600;
+            color: #6a7f9e;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
 
-    .time-pill .value {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #e2e8f0;
-    }
+        .time-pill .value {
+            font-size: clamp(0.75rem, 2.6vw, 0.95rem);
+            font-weight: 700;
+            color: #e2e8f0;
+        }
 
-    .time-arrow {
-      color: #475569;
-      font-size: 1.1rem;
-    }
+        .schedule-arrow {
+            color: #3a5070;
+            font-size: 1rem;
+            flex-shrink: 0;
+            padding: 0 2px;
+        }
 
-    .duration-pill {
-      text-align: center;
-      background: rgba(99, 102, 241, 0.15);
-      border: 1px solid rgba(99, 102, 241, 0.3);
-      border-radius: 10px;
-      padding: 0.6rem 0.8rem;
-    }
+        .duration-pill {
+            flex: 1 1 0;
+            min-width: 64px;
+            text-align: center;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.18);
+            border-radius: 12px;
+            padding: 6px 4px;
+        }
 
-    .duration-pill .label {
-      font-size: 0.68rem;
-      color: #a5b4fc;
-      margin-bottom: 3px;
-    }
+        .duration-pill .label {
+            font-size: 0.55rem;
+            font-weight: 600;
+            color: #8b9cf7;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
 
-    .duration-pill .value {
-      font-size: 1rem;
-      font-weight: 700;
-      color: #c7d2fe;
-    }
+        .duration-pill .value {
+            font-size: clamp(0.75rem, 2.6vw, 0.95rem);
+            font-weight: 700;
+            color: #c7d2fe;
+        }
 
-    /* ── Input Section ── */
-    .input-section {
-      margin-bottom: 1.8rem;
-    }
+        /* ── Input ── */
+        .input-section {
+            margin-bottom: 20px;
+        }
 
-    .input-label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.6rem;
-    }
+        .input-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
 
-    .input-label span {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #cbd5e1;
-    }
+        .input-label span {
+            font-size: clamp(0.78rem, 2.6vw, 0.88rem);
+            font-weight: 600;
+            color: #cbd5e1;
+        }
 
-    .input-hint {
-      font-size: 0.7rem;
-      color: #64748b;
-      background: rgba(255,255,255,0.06);
-      padding: 2px 8px;
-      border-radius: 20px;
-      border: 1px solid rgba(255,255,255,0.08);
-    }
+        .input-hint {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #4a6a8a;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 3px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
 
-    .time-input-wrapper {
-      position: relative;
-    }
+        .time-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
 
-    .time-input-wrapper .input-icon {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 18px;
-      color: #60a5fa;
-      pointer-events: none;
-    }
+        .time-input-wrapper .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #60a5fa;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.8;
+        }
 
-    input[type="time"] {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.07);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 12px;
-      padding: 0.9rem 1rem 0.9rem 3rem;
-      color: #f1f5f9;
-      font-size: 1.3rem;
-      font-weight: 600;
-      font-family: inherit;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-      cursor: pointer;
-      letter-spacing: 1px;
-    }
+        input[type="time"] {
+            width: 100%;
+            height: 56px;
+            min-height: 48px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 0 12px 0 46px;
+            color: #f1f5f9;
+            font-size: clamp(1rem, 3.6vw, 1.3rem);
+            font-weight: 700;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+            touch-action: manipulation;
+            -webkit-appearance: none;
+            appearance: none;
+        }
 
-    input[type="time"]:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(96, 165, 250, 0.4);
-    }
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) opacity(0.4);
+            cursor: pointer;
+            padding: 6px;
+            margin-right: 2px;
+            min-height: 30px;
+            min-width: 30px;
+        }
 
-    input[type="time"]:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-      background: rgba(255, 255, 255, 0.1);
-    }
+        input[type="time"]::-moz-calendar-picker {
+            filter: invert(1) opacity(0.4);
+        }
 
-    /* Chrome/Edge time input colour fixes */
-    input[type="time"]::-webkit-calendar-picker-indicator {
-      filter: invert(1) opacity(0.5);
-      cursor: pointer;
-    }
+        input[type="time"]:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(96, 165, 250, 0.3);
+        }
 
-    /* ── Result Section ── */
-    .result-card {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 16px;
-      padding: 1.5rem;
-      text-align: center;
-      margin-bottom: 1.2rem;
-      transition: border-color 0.3s;
-    }
+        input[type="time"]:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+            background: rgba(255, 255, 255, 0.08);
+        }
 
-    .result-card.on-time {
-      border-color: rgba(34, 197, 94, 0.35);
-      background: rgba(34, 197, 94, 0.05);
-    }
+        input[type="time"]::-webkit-inner-spin-button,
+        input[type="time"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            appearance: none;
+        }
 
-    .result-card.late {
-      border-color: rgba(251, 146, 60, 0.35);
-      background: rgba(251, 146, 60, 0.05);
-    }
+        /* ── Result ── */
+        .result-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 18px 14px 16px;
+            text-align: center;
+            transition: border-color 0.4s, background 0.4s;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .result-out-label {
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: #64748b;
-      margin-bottom: 0.5rem;
-    }
+        .result-card.on-time {
+            border-color: rgba(34, 197, 94, 0.25);
+            background: rgba(34, 197, 94, 0.04);
+        }
 
-    .result-out-time {
-      font-size: 3rem;
-      font-weight: 800;
-      line-height: 1;
-      letter-spacing: -1px;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, #f1f5f9, #cbd5e1);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      transition: opacity 0.2s;
-    }
+        .result-card.late {
+            border-color: rgba(251, 146, 60, 0.25);
+            background: rgba(251, 146, 60, 0.04);
+        }
 
-    .result-out-time.on-time {
-      background: linear-gradient(135deg, #4ade80, #22d3ee);
-      -webkit-background-clip: text;
-      background-clip: text;
-    }
+        .result-out-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #4a6a8a;
+            margin-bottom: 4px;
+        }
 
-    .result-out-time.late {
-      background: linear-gradient(135deg, #fb923c, #fbbf24);
-      -webkit-background-clip: text;
-      background-clip: text;
-    }
+        .result-out-time {
+            font-size: clamp(2.4rem, 9vw, 3.4rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
 
-    /* ── Status Badge ── */
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      margin-bottom: 1rem;
-      transition: all 0.25s;
-    }
+        .result-out-time.on-time {
+            background: linear-gradient(135deg, #4ade80, #22d3ee);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-    .status-badge.on-time {
-      background: rgba(34, 197, 94, 0.15);
-      color: #4ade80;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-    }
+        .result-out-time.late {
+            background: linear-gradient(135deg, #fb923c, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
-    .status-badge.late {
-      background: rgba(251, 146, 60, 0.15);
-      color: #fb923c;
-      border: 1px solid rgba(251, 146, 60, 0.3);
-    }
+        .result-out-time.placeholder {
+            -webkit-text-fill-color: #3a5070;
+            background: none;
+            color: #3a5070;
+            opacity: 0.6;
+            font-weight: 400;
+            letter-spacing: 0;
+        }
 
-    /* ── Friendly Message ── */
-    .result-message {
-      font-size: 0.87rem;
-      color: #94a3b8;
-      line-height: 1.5;
-      min-height: 2.5em;
-      transition: color 0.2s;
-    }
+        .result-out-time .meridiem {
+            font-size: 0.45em;
+            font-weight: 600;
+            opacity: 0.7;
+            margin-left: 2px;
+        }
 
-    /* ── Duration Bar ── */
-    .duration-info {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid rgba(255,255,255,0.06);
-      font-size: 0.78rem;
-      color: #64748b;
-    }
+        /* ── Status Badge ── */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: clamp(0.7rem, 2.4vw, 0.8rem);
+            font-weight: 700;
+            margin-bottom: 12px;
+            min-height: 38px;
+            touch-action: manipulation;
+            user-select: none;
+        }
 
-    .duration-badge {
-      background: rgba(255,255,255,0.07);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
-      padding: 3px 10px;
-      color: #94a3b8;
-      font-weight: 600;
-      font-size: 0.78rem;
-    }
+        .status-badge.on-time {
+            background: rgba(34, 197, 94, 0.1);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.15);
+        }
 
-    /* ── Empty / Placeholder State ── */
-    .placeholder-text {
-      color: #475569;
-      font-style: italic;
-      font-size: 0.85rem;
-    }
+        .status-badge.late {
+            background: rgba(251, 146, 60, 0.1);
+            color: #fb923c;
+            border: 1px solid rgba(251, 146, 60, 0.15);
+        }
 
-    /* ── Footer ── */
-    .footer {
-      margin-top: 2rem;
-      text-align: center;
-      font-size: 0.78rem;
-      color: #475569;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
+        /* ── Message ── */
+        .result-message {
+            font-size: clamp(0.75rem, 2.4vw, 0.85rem);
+            color: #94a3b8;
+            line-height: 1.5;
+            min-height: 2.4em;
+            transition: color 0.3s;
+            padding: 0 4px;
+        }
 
-    .footer .heart {
-      color: #f43f5e;
-      font-size: 0.9rem;
-      animation: pulse 1.4s infinite;
-    }
+        /* ── Duration Info ── */
+        .duration-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: clamp(0.65rem, 2vw, 0.75rem);
+            color: #4a6a8a;
+            flex-wrap: wrap;
+        }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.25); }
-    }
+        .duration-badge {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 30px;
+            padding: 3px 12px;
+            color: #94a3b8;
+            font-weight: 600;
+            font-size: clamp(0.65rem, 2vw, 0.75rem);
+            min-height: 28px;
+            display: inline-flex;
+            align-items: center;
+        }
 
-    /* ── Responsive ── */
-    @media (max-width: 520px) {
-      .card { padding: 2rem 1.4rem; border-radius: 18px; }
-      .result-out-time { font-size: 2.4rem; }
-      .schedule-times { flex-wrap: wrap; }
-    }
-  </style>
+        /* ── Footer ── */
+        .footer {
+            margin-top: 18px;
+            text-align: center;
+            font-size: clamp(0.65rem, 2vw, 0.78rem);
+            color: #2a4060;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            padding: 4px 0;
+        }
+
+        .footer .dev {
+            font-weight: 600;
+            background: linear-gradient(135deg, #7a9abb, #a0b8d0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer .heart {
+            color: #f43f5e;
+            font-size: clamp(0.75rem, 2.2vw, 0.85rem);
+            animation: pulse 1.6s infinite;
+            -webkit-text-fill-color: #f43f5e;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.15);
+            }
+        }
+
+        /* ── Mobile Fine-Tune ── */
+        @media (max-width: 420px) {
+            .card {
+                padding: 16px 14px 20px;
+                border-radius: 22px;
+            }
+
+            .header-icon {
+                width: 42px;
+                height: 42px;
+                font-size: 20px;
+                border-radius: 14px;
+            }
+
+            .header-text h1 {
+                font-size: 1.2rem;
+            }
+
+            .schedule-ref {
+                padding: 10px 10px;
+                border-radius: 14px;
+            }
+
+            .time-pill,
+            .duration-pill {
+                padding: 4px 2px;
+            }
+
+            .time-pill .value,
+            .duration-pill .value {
+                font-size: clamp(0.7rem, 2.4vw, 0.8rem);
+            }
+
+            input[type="time"] {
+                height: 50px;
+                min-height: 44px;
+                padding: 0 10px 0 42px;
+                font-size: clamp(0.9rem, 3.4vw, 1rem);
+                border-radius: 14px;
+            }
+
+            .time-input-wrapper .input-icon {
+                left: 12px;
+                font-size: 16px;
+            }
+
+            .result-card {
+                padding: 14px 10px 12px;
+                border-radius: 16px;
+            }
+
+            .result-out-time {
+                font-size: clamp(2rem, 8vw, 2.6rem);
+            }
+
+            .status-badge {
+                padding: 4px 12px;
+                font-size: clamp(0.65rem, 2vw, 0.72rem);
+                min-height: 32px;
+                margin-bottom: 8px;
+            }
+
+            .result-message {
+                font-size: clamp(0.7rem, 2.2vw, 0.78rem);
+                min-height: 2.2em;
+            }
+
+            .duration-info {
+                margin-top: 10px;
+                padding-top: 8px;
+                font-size: clamp(0.6rem, 1.8vw, 0.7rem);
+            }
+
+            .duration-badge {
+                font-size: clamp(0.6rem, 1.8vw, 0.7rem);
+                min-height: 24px;
+                padding: 2px 10px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .card {
+                padding: 12px 10px 16px;
+                border-radius: 18px;
+            }
+
+            .header {
+                gap: 8px;
+                margin-bottom: 14px;
+            }
+
+            .header-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 17px;
+                border-radius: 12px;
+            }
+
+            .header-text h1 {
+                font-size: 1rem;
+            }
+
+            .schedule-ref {
+                padding: 8px 8px;
+                margin-bottom: 14px;
+            }
+
+            .schedule-grid {
+                gap: 4px;
+            }
+
+            .time-pill .value,
+            .duration-pill .value {
+                font-size: 0.65rem;
+            }
+
+            input[type="time"] {
+                height: 44px;
+                min-height: 40px;
+                padding: 0 8px 0 38px;
+                font-size: 0.85rem;
+                border-radius: 12px;
+            }
+
+            .time-input-wrapper .input-icon {
+                left: 10px;
+                font-size: 14px;
+            }
+
+            .result-out-time {
+                font-size: 1.8rem;
+            }
+
+            .result-card {
+                padding: 10px 8px 10px;
+            }
+        }
+
+        /* ── Landscape ── */
+        @media (max-height: 600px) and (orientation: landscape) {
+            body {
+                padding: 8px 14px;
+            }
+
+            .card {
+                padding: 12px 16px 16px;
+                border-radius: 20px;
+                max-width: 420px;
+            }
+
+            .header {
+                margin-bottom: 10px;
+            }
+            .header-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .header-text h1 {
+                font-size: 1.1rem;
+            }
+
+            .schedule-ref {
+                padding: 6px 10px;
+                margin-bottom: 10px;
+                border-radius: 12px;
+            }
+            .schedule-ref-title {
+                font-size: 0.5rem;
+                margin-bottom: 4px;
+            }
+            .time-pill,
+            .duration-pill {
+                padding: 2px 2px;
+            }
+            .time-pill .value,
+            .duration-pill .value {
+                font-size: 0.65rem;
+            }
+
+            .input-section {
+                margin-bottom: 10px;
+            }
+            .input-label {
+                margin-bottom: 4px;
+            }
+            input[type="time"] {
+                height: 40px;
+                min-height: 36px;
+                padding: 0 8px 0 36px;
+                font-size: 0.85rem;
+            }
+            .time-input-wrapper .input-icon {
+                left: 10px;
+                font-size: 14px;
+            }
+
+            .result-card {
+                padding: 10px 10px 8px;
+                border-radius: 14px;
+            }
+            .result-out-time {
+                font-size: 1.8rem;
+                margin-bottom: 4px;
+            }
+            .status-badge {
+                padding: 2px 10px;
+                font-size: 0.6rem;
+                min-height: 26px;
+                margin-bottom: 6px;
+            }
+            .result-message {
+                font-size: 0.65rem;
+                min-height: 1.8em;
+            }
+            .duration-info {
+                margin-top: 6px;
+                padding-top: 6px;
+                font-size: 0.6rem;
+            }
+            .footer {
+                margin-top: 8px;
+                font-size: 0.6rem;
+            }
+        }
+
+        /* ── Reduced motion ── */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .footer .heart {
+                animation: none;
+            }
+        }
+    </style>
 </head>
 <body>
 
-  <div class="card" role="main">
+    <div class="card" role="main" aria-label="Time Keeper calculator">
 
-    <!-- Header -->
-    <div class="header">
-      <div class="header-icon" aria-hidden="true">🕐</div>
-      <div class="header-text">
-        <h1>Time Keeper</h1>
-        <p>Work clock-out calculator</p>
-      </div>
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon" aria-hidden="true">⏱️</div>
+            <div class="header-text">
+                <h1>Time Keeper</h1>
+                <p>Clock‑out calculator</p>
+            </div>
+        </div>
+
+        <!-- Standard Schedule (shows 8:15 AM & 5:00 PM) -->
+        <!-- <div class="schedule-ref" aria-label="Standard shift schedule">
+            <div class="schedule-ref-title">Standard Shift</div>
+            <div class="schedule-grid">
+                <div class="time-pill">
+                    <div class="label">In</div>
+                    <div class="value" id="stdInDisplay">8:15 AM</div>
+                </div>
+                <div class="schedule-arrow" aria-hidden="true">→</div>
+                <div class="time-pill">
+                    <div class="label">Out</div>
+                    <div class="value" id="stdOutDisplay">5:00 PM</div>
+                </div>
+                <div class="duration-pill">
+                    <div class="label">Total</div>
+                    <div class="value" id="stdDurDisplay">8h 45m</div>
+                </div>
+            </div>
+        </div> -->
+
+        <!-- Input: Your Clock-In Time -->
+        <div class="input-section">
+            <div class="input-label">
+                <span>Your Clock‑In Time</span>
+                <span class="input-hint">24‑hr</span>
+            </div>
+            <div class="time-input-wrapper">
+                <span class="input-icon" aria-hidden="true">🕐</span>
+                <input
+                type="time"
+                id="clockInTime"
+                aria-label="Enter your clock-in time"
+                autocomplete="off"
+                inputmode="numeric"
+                />
+            </div>
+        </div>
+
+        <!-- Result -->
+        <div class="result-card" id="resultCard" aria-live="polite">
+            <div class="result-out-label">Required Clock‑Out</div>
+            <div class="result-out-time placeholder" id="outTime">
+                –:– –
+            </div>
+            <div id="statusBadge"></div>
+            <div class="result-message" id="resultMessage">
+                Enter your clock‑in time above.
+            </div>
+            <div class="duration-info" id="durationInfo" style="display: none;">
+                <span>⏱ Work duration</span>
+                <span class="duration-badge" id="totalDuration">8h 45m</span>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Standard Schedule Reference -->
-    <!-- <div class="schedule-ref" aria-label="Standard shift schedule">
-      <div class="schedule-ref-title">Standard Shift</div>
-      <div class="schedule-times">
-        <div class="time-pill">
-          <div class="label">Clock In</div>
-          <div class="value">8:15 AM</div>
-        </div>
-        <div class="time-arrow" aria-hidden="true">→</div>
-        <div class="time-pill">
-          <div class="label">Clock Out</div>
-          <div class="value">5:00 PM</div>
-        </div>
-        <div class="duration-pill">
-          <div class="label">Duration</div>
-          <div class="value">8h 45m</div>
-        </div>
-      </div>
-    </div> -->
+    <!-- Footer -->
+    <footer class="footer">
+        <span>Developed by <span class="dev">Sankha</span></span>
+        <span class="heart" aria-label="with love">♥</span>
+    </footer>
 
-    <!-- Time Input -->
-    <div class="input-section">
-      <div class="input-label">
-        <span>Your Clock-In Time</span>
-        <span class="input-hint">24-hr format</span>
-      </div>
-      <div class="time-input-wrapper">
-        <span class="input-icon" aria-hidden="true">⏱</span>
-        <input
-          type="time"
-          id="clockInTime"
-          aria-label="Enter your clock-in time"
-          autocomplete="off"
-        />
-      </div>
-    </div>
+    <script>
+        (function() {
+            'use strict';
 
-    <!-- Result Card -->
-    <div class="result-card" id="resultCard" aria-live="polite">
-      <div class="result-out-label">Required Clock-Out</div>
-      <div class="result-out-time" id="outTime">
-        <span class="placeholder-text">–:– –</span>
-      </div>
-      <div id="statusBadge"></div>
-      <div class="result-message" id="resultMessage">
-        Enter your clock-in time above to calculate.
-      </div>
-      <div class="duration-info" id="durationInfo" style="display:none;">
-        <span>Total work duration:</span>
-        <span class="duration-badge" id="totalDuration">8h 45m</span>
-      </div>
-    </div>
+            // ─── Constants ───────────────────────────────────────────────
+            const STD_IN_HOURS = 8;
+            const STD_IN_MINUTES = 15;
+            const STD_OUT_HOURS = 17;
+            const STD_OUT_MINUTES = 0;
 
-  </div>
+            const STD_IN_TOTAL = STD_IN_HOURS * 60 + STD_IN_MINUTES; // 495
+            const STD_OUT_TOTAL = STD_OUT_HOURS * 60 + STD_OUT_MINUTES; // 1020
+            const SHIFT_DURATION = STD_OUT_TOTAL - STD_IN_TOTAL; // 525
 
-  <!-- Footer -->
-  <footer class="footer">
-    <span>Developed by Sankha</span>
-    <span class="heart" aria-label="with love">♥</span>
-  </footer>
+            // ─── DOM refs ──────────────────────────────────────────────
+            const inputEl = document.getElementById('clockInTime');
+            const resultCard = document.getElementById('resultCard');
+            const outTimeEl = document.getElementById('outTime');
+            const statusBadge = document.getElementById('statusBadge');
+            const resultMsg = document.getElementById('resultMessage');
+            const durationInfo = document.getElementById('durationInfo');
+            const totalDurEl = document.getElementById('totalDuration');
 
-  <script>
-    /* ── Constants ── */
-    const STANDARD_IN_MINUTES  = 8 * 60 + 15;  // 8:15 AM = 495 min from midnight
-    const STANDARD_OUT_MINUTES = 17 * 60;        // 5:00 PM = 1020 min from midnight
-    const SHIFT_DURATION       = STANDARD_OUT_MINUTES - STANDARD_IN_MINUTES; // 525 min (8h45m)
+            // Standard display refs
+            const stdInDisplay = document.getElementById('stdInDisplay');
+            const stdOutDisplay = document.getElementById('stdOutDisplay');
+            const stdDurDisplay = document.getElementById('stdDurDisplay');
 
-    /* ── DOM Refs ── */
-    const inputEl       = document.getElementById('clockInTime');
-    const resultCard    = document.getElementById('resultCard');
-    const outTimeEl     = document.getElementById('outTime');
-    const statusBadge   = document.getElementById('statusBadge');
-    const resultMsg     = document.getElementById('resultMessage');
-    const durationInfo  = document.getElementById('durationInfo');
-    const totalDurEl    = document.getElementById('totalDuration');
+            // ─── Helpers ──────────────────────────────────────────────
 
-    /* ── Convert minutes-from-midnight to 12hr string ── */
-    function to12hr(minutes) {
-      const h24  = Math.floor(minutes / 60) % 24;
-      const m    = minutes % 60;
-      const ampm = h24 >= 12 ? 'PM' : 'AM';
-      const h12  = h24 % 12 === 0 ? 12 : h24 % 12;
-      return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
-    }
+            function to12hr(minutes) {
+                const h24 = Math.floor(minutes / 60) % 24;
+                const m = minutes % 60;
+                const ampm = h24 >= 12 ? 'PM' : 'AM';
+                const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+                return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
+            }
 
-    /* ── Format delay/duration as "Xh Ym" or "Ym" ── */
-    function formatDuration(totalMinutes) {
-      const h = Math.floor(totalMinutes / 60);
-      const m = totalMinutes % 60;
-      if (h > 0 && m > 0) return `${h}h ${m}m`;
-      if (h > 0)           return `${h}h`;
-      return `${m}m`;
-    }
+            function formatDuration(totalMinutes) {
+                if (totalMinutes === 0) return '0m';
+                const h = Math.floor(totalMinutes / 60);
+                const m = totalMinutes % 60;
+                const parts = [];
+                if (h > 0) parts.push(`${h}h`);
+                if (m > 0) parts.push(`${m}m`);
+                return parts.join(' ');
+            }
 
-    /* ── Main Calculation & UI Update ── */
-    function calculate() {
-      const raw = inputEl.value; // "HH:MM" or ""
+            function parseTimeInput(value) {
+                if (!value) return null;
+                const parts = value.split(':');
+                if (parts.length !== 2) return null;
+                const h = parseInt(parts[0], 10);
+                const m = parseInt(parts[1], 10);
+                if (isNaN(h) || isNaN(m) || h < 0 || h > 23 || m < 0 || m > 59) return null;
+                return h * 60 + m;
+            }
 
-      /* No input yet — reset to placeholder state */
-      if (!raw) {
-        resultCard.className = 'result-card';
-        outTimeEl.className  = 'result-out-time';
-        outTimeEl.innerHTML  = '<span class="placeholder-text">–:– –</span>';
-        statusBadge.innerHTML = '';
-        resultMsg.textContent = 'Enter your clock-in time above to calculate.';
-        durationInfo.style.display = 'none';
-        return;
-      }
+            // ─── Core Calculation ──────────────────────────────────────
 
-      /* Parse the input into minutes-from-midnight */
-      const [hh, mm]   = raw.split(':').map(Number);
-      const inMinutes  = hh * 60 + mm;
+            function calculate() {
+                const raw = inputEl.value;
+                const inMinutes = parseTimeInput(raw);
 
-      /* Calculate delay and required out time */
-      const delay        = Math.max(0, inMinutes - STANDARD_IN_MINUTES);
-      const outMinutes   = STANDARD_OUT_MINUTES + delay;
-      const isLate       = delay > 0;
-      const outTimeStr   = to12hr(outMinutes);
+                // ── No valid input ──
+                if (inMinutes === null) {
+                    resultCard.className = 'result-card';
+                    outTimeEl.className = 'result-out-time placeholder';
+                    outTimeEl.textContent = '–:– –';
+                    statusBadge.innerHTML = '';
+                    resultMsg.textContent = 'Enter your clock‑in time above.';
+                    durationInfo.style.display = 'none';
+                    return;
+                }
 
-      /* ── Update result time ── */
-      outTimeEl.className  = `result-out-time ${isLate ? 'late' : 'on-time'}`;
-      outTimeEl.textContent = outTimeStr;
+                // ── Calculate ──
+                const delay = Math.max(0, inMinutes - STD_IN_TOTAL);
+                const outMinutes = STD_OUT_TOTAL + delay;
+                const isLate = delay > 0;
+                const outTimeStr = to12hr(outMinutes);
 
-      /* ── Update card style ── */
-      resultCard.className = `result-card ${isLate ? 'late' : 'on-time'}`;
+                // ── Update out time ──
+                outTimeEl.className = `result-out-time ${isLate ? 'late' : 'on-time'}`;
+                outTimeEl.textContent = outTimeStr;
 
-      /* ── Status badge ── */
-      if (isLate) {
-        statusBadge.innerHTML =
-          `<span class="status-badge late">⏰ Late by ${formatDuration(delay)}</span>`;
-      } else {
-        statusBadge.innerHTML =
-          `<span class="status-badge on-time">✅ On Time</span>`;
-      }
+                // ── Update card style ──
+                resultCard.className = `result-card ${isLate ? 'late' : 'on-time'}`;
 
-      /* ── Friendly message ── */
-      if (isLate) {
-        resultMsg.textContent =
-          `You clocked in ${formatDuration(delay)} late — you'll need to stay until ${outTimeStr} (${formatDuration(delay)} after 5:00 PM).`;
-      } else {
-        const earlyBy = STANDARD_IN_MINUTES - inMinutes;
-        if (earlyBy > 0) {
-          resultMsg.textContent =
-            `You're ${formatDuration(earlyBy)} early — great start! Clock out at the standard 5:00 PM.`;
-        } else {
-          resultMsg.textContent =
-            `Right on schedule! Clock out at the standard 5:00 PM.`;
-        }
-      }
+                // ── Status badge ──
+                if (isLate) {
+                    statusBadge.innerHTML =
+                        `<span class="status-badge late">⏰ Late by ${formatDuration(delay)}</span>`;
+                } else {
+                    const earlyBy = STD_IN_TOTAL - inMinutes;
+                    if (earlyBy > 0) {
+                        statusBadge.innerHTML =
+                            `<span class="status-badge on-time">✅ ${formatDuration(earlyBy)} early</span>`;
+                    } else {
+                        statusBadge.innerHTML =
+                            `<span class="status-badge on-time">✅ On time</span>`;
+                    }
+                }
 
-      /* ── Duration indicator ── */
-      durationInfo.style.display = 'flex';
-      totalDurEl.textContent = formatDuration(SHIFT_DURATION); // always 8h 45m
-    }
+                // ── Friendly message ──
+                if (isLate) {
+                    resultMsg.textContent =
+                        `You clocked in ${formatDuration(delay)} late — stay until ${outTimeStr} (${formatDuration(delay)} after 5:00 PM).`;
+                } else if (inMinutes < STD_IN_TOTAL) {
+                    const earlyBy = STD_IN_TOTAL - inMinutes;
+                    resultMsg.textContent =
+                        `You're ${formatDuration(earlyBy)} early — clock out at 5:00 PM.`;
+                } else {
+                    resultMsg.textContent =
+                        `Right on schedule! Clock out at 5:00 PM.`;
+                }
 
-    /* ── Event Listener: real-time update ── */
-    inputEl.addEventListener('input', calculate);
-    inputEl.addEventListener('change', calculate);
+                // ── Duration info ──
+                durationInfo.style.display = 'flex';
+                totalDurEl.textContent = formatDuration(SHIFT_DURATION);
+            }
 
-    /* ── Pre-populate with current time on load ── */
-    (function setCurrentTime() {
-      const now = new Date();
-      const hh  = String(now.getHours()).padStart(2, '0');
-      const mm  = String(now.getMinutes()).padStart(2, '0');
-      inputEl.value = `${hh}:${mm}`;
-      calculate();
-    })();
-  </script>
+            // ─── Init Standard Display ────────────────────────────────
+
+            function initStandardDisplay() {
+                stdInDisplay.textContent = to12hr(STD_IN_TOTAL);
+                stdOutDisplay.textContent = to12hr(STD_OUT_TOTAL);
+                stdDurDisplay.textContent = formatDuration(SHIFT_DURATION);
+            }
+
+            // ─── Event Listeners ──────────────────────────────────────
+
+            inputEl.addEventListener('input', calculate);
+            inputEl.addEventListener('change', calculate);
+
+            // ─── Set default to current time ──────────────────────────
+
+            function setCurrentTime() {
+                const now = new Date();
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mm = String(now.getMinutes()).padStart(2, '0');
+                inputEl.value = `${hh}:${mm}`;
+                calculate();
+            }
+
+            // ─── Boot ──────────────────────────────────────────────────
+
+            function boot() {
+                initStandardDisplay();
+                // Use requestAnimationFrame to avoid layout thrash
+                requestAnimationFrame(setCurrentTime);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', boot);
+            } else {
+                boot();
+            }
+
+            // ─── Refresh on visibility change ──────────────────────────
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden && inputEl.value) {
+                    calculate();
+                }
+            });
+
+        })();
+    </script>
 
 </body>
 </html>
